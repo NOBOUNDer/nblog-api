@@ -40,6 +40,7 @@ var mysql = require('mysql');
 var con = mysql.createConnection({
     host: 'localhost',//数据库ip地址账号
     user: 'root',//数据库 登录用户名
+    // port: 3307,
     password: '1234567890',//数据库 登录密码
     database: 'sys_nobound'//数据库名称
 });
