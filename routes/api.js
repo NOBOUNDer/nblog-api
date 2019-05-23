@@ -40,6 +40,7 @@ var mysql = require('mysql');
 var con = mysql.createConnection({
     host: 'localhost',//数据库ip地址账号
     user: 'root',//数据库 登录用户名
+    // port: 3307,
     password: '1234567890',//数据库 登录密码
     database: 'sys_nobound'//数据库名称
 });
@@ -215,11 +216,12 @@ router.post('/createArticleClassify', function (req, res) {
 });
 // 更新文章分类
 router.post('/updateArticleClassify', function (req, res) {
-    let sql = 'update nblog_articleClassify set title=?,route=?,description=?';
+    let sql = 'update nblog_articleClassify set title=?,route=?,description=? where id=?';
     let data = [
         req.body.title,
         req.body.route,
         req.body.description,
+        req.body.id,
     ];
     con.query(sql, data, function (e, r) {
         if (e) {
