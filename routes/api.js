@@ -60,11 +60,11 @@ router.post('/signIn', function (req, res) {
         }
     })
 });
-
 // 退出登录
 router.get('/logOut', function (req, res) {
     res.cookie("userName", {expires: new Date(0)});
 });
+
 
 // 获取导航分层数据
 router.get('/getNavSelect', function (req, res) {
@@ -75,7 +75,6 @@ router.get('/getNavSelect', function (req, res) {
         res.send(data);
     })
 });
-
 // 添加导航
 router.post('/createNav', function (req, res) {
     let sql = 'insert into nblog_nav set pid=?,navName=?,route=?,keyword=?,description=?';
@@ -91,7 +90,6 @@ router.post('/createNav', function (req, res) {
         res.send("添加成功！");
     });
 });
-
 // 更新导航
 router.post('/updateNav', function (req, res) {
     let sql = 'update nblog_nav set navName=?,route=?,keyword=?,description=? where id=?';
@@ -107,15 +105,12 @@ router.post('/updateNav', function (req, res) {
         res.send("更新成功！");
     });
 });
-
 // 获取单行导航
 router.get('/getNav', function (req, res) {
     con.query('select * from nblog_nav where id=?', [req.query.id], function (e, r) {
         res.send(r);
     })
 });
-
-
 // 删除导航
 router.get('/delNav', function (req, res) {
     //选取id号和pid号和前端传过来的id号相等的项，对其进行删除，即删除选中栏以及选中栏的子栏
@@ -125,14 +120,44 @@ router.get('/delNav', function (req, res) {
     })
 });
 
-// 添加文章
-router.post('/createArticle', function (req, res) {
-    let sql = 'insert into nblog_article set title=?,author=?,classify=?,type=?,description=?,content=?';
+
+// 获取文章列表
+router.get('/listArticle', function (req, res) {
+    let sql = 'select * from nblog_article';
+    con.query(sql, function (e, r) {
+        res.send(r);
+    })
+})
+// 获取文章
+router.get('/getArticle', function (req, res) {
+    let sql = 'select * from nblog_article where id=?';
+    data = [req.query.id]
+    con.query(sql, data, function (e, r) {
+        res.send(r);
+    })
+})
+// 更新文章
+router.post('/updateArticle', function (req, res) {
+    let sql = 'update nblog_article set title=?,author=?,pid=?,description=?,content=? where id=?';
     let data = [
         req.body.title,
         req.body.author,
-        req.body.classify,
-        req.body.type,
+        req.body.pid,
+        req.body.description,
+        req.body.content,
+        req.body.id
+    ]
+    con.query(sql, data, function (e, r) {
+        res.send('更新成功！');
+    })
+})
+// 添加文章
+router.post('/createArticle', function (req, res) {
+    let sql = 'insert into nblog_article set title=?,author=?,pid=?,description=?,content=?';
+    let data = [
+        req.body.title,
+        req.body.author,
+        req.body.pid,
         req.body.description,
         req.body.content,
     ];
@@ -144,6 +169,79 @@ router.post('/createArticle', function (req, res) {
         }
     });
 });
+// 删除文章
+router.get('/delArticle', function (req, res) {
+    let sql = 'delete from nblog_article where id=?';
+    let data = [req.query.id];
+    con.query(sql, data, function (e, r) {
+        if (e) {
+            // console.log(e)
+        } else {
+            res.send("删除成功！");
+        }
+    });
+});
+// 获取文章分类列表
+router.get('/listArticleClassify', function (req, res) {
+    let sql = 'select * from nblog_articleClassify'
+    con.query(sql, function (e, r) {
+        res.send(r)
+    })
+})
+// 获取单行文章分类
+router.get('/getArticleClassify', function (req, res) {
+    let sql = 'select * from nblog_articleClassify where id=?'
+    let data = [req.query.id]
+    con.query(sql, data, function (e, r) {
+        res.send(r)
+    })
+})
+// 添加文章分类
+router.post('/createArticleClassify', function (req, res) {
+    let sql = 'insert into nblog_articleClassify set title=?,pid=?,route=?,description=?';
+    let data = [
+        req.body.title,
+        req.body.pid,
+        req.body.route,
+        req.body.description,
+    ];
+    con.query(sql, data, function (e, r) {
+        if (e) {
+            // console.log(e)
+        } else {
+            res.send("添加成功！");
+        }
+    });
+});
+// 更新文章分类
+router.post('/updateArticleClassify', function (req, res) {
+    let sql = 'update nblog_articleClassify set title=?,route=?,description=?';
+    let data = [
+        req.body.title,
+        req.body.route,
+        req.body.description,
+    ];
+    con.query(sql, data, function (e, r) {
+        if (e) {
+            // console.log(e)
+        } else {
+            res.send("更新成功！");
+        }
+    });
+});
+// 删除文章分类
+router.get('/delArticleClassify', function (req, res) {
+    let sql = 'delete from nblog_articleClassify where id=?';
+    let data = [req.query.id];
+    con.query(sql, data, function (e, r) {
+        if (e) {
+            // console.log(e)
+        } else {
+            res.send("删除成功！");
+        }
+    });
+});
+
 
 // 获取网站设置信息
 router.get('/getSetting', function (req, res) {
@@ -151,7 +249,6 @@ router.get('/getSetting', function (req, res) {
         res.send(r);
     })
 });
-
 // 网站logo上传
 router.post('/logo', upload.single('avatar'), function (req, res) {
     // console.log(req.file)
@@ -163,7 +260,6 @@ router.post('/logo', upload.single('avatar'), function (req, res) {
         res.send("上传成功！");
     });
 });
-
 // 网站设置
 router.post('/setting', function (req, res) {
     let sql = 'update nblog_setting set title=?,keyword=?,description=?,icp=? where id=1';
