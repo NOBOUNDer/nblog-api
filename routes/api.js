@@ -10,7 +10,7 @@ let host = 'http://127.0.0.1:3017';
 router.all("*", function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "http://127.0.0.1:8080");//*表示允许所有的源
     res.header("Access-Control-Allow-Headers", "X-Requested-With");//检测是不是ajax访问
-    res.header("Access-Control-Allow-Methods", "POST,GET");//允许请求的方法是post和get
+    res.header("Access-Control-Allow-Methods", "POST,GET,GET,DELETE,OPTIONS");//允许请求的方法是post和get
     res.header("Content-Type", "application/json;charset=utf-8");//设置响应头部
     res.header('Access-Control-Allow-Credentials', 'true');//node后台启动时设置允许携带cookie
     next();//相当于继续匹配/HT路由 只执行传入需要匹配的路由
@@ -22,7 +22,7 @@ router.get('/', function (req, res, next) {
     res.send('respond with a resource');
 });
 
-// 图片上传配置
+// logo图片上传配置
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         var dir = "public/images"; // 设置目录名称
@@ -34,6 +34,18 @@ var storage = multer.diskStorage({
     }
 });
 var upload = multer({storage: storage})//使用配置文件
+
+var storage2 = multer.diskStorage({
+    destination: function (req, file, cb) {
+        var dir = "public/editorImages"; // 设置目录名称
+        multer({dest: dir});// 如果目录不存在就创建目录
+        cb(null, dir);// 把上传的文件存在这个目录
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + "." + file.originalname.split(".")[1]);//设置上传的文件名称
+    }
+});
+var upload2 = multer({storage: storage2})//使用配置文件
 
 // 数据库配置
 var mysql = require('mysql');
@@ -277,4 +289,16 @@ router.post('/setting', function (req, res) {
     });
 });
 
+// 富文本图片上传
+router.post('/editorImages', upload2.single('file'), function (req, res) {
+    // console.log(req.file)
+    let sql = 'insert into nblog_editorImages set editorImage=?';
+    let data = [
+        req.file.filename,
+    ];
+    con.query(sql, data, function (e, r) {
+        // console.log(r)
+        res.send(req.file.filename);
+    });
+});
 module.exports = router;
