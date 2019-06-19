@@ -4,7 +4,7 @@ var router = express.Router();
 var navcm = require("navcm");
 var multer = require('multer');// 图片上传模块
 var nav = navcm.navCM();// navcm模块自动帮助我们进行分类层级,要在数据库中添加pid栏
-let host = 'http://127.0.0.1:3017';
+let host = 'http://127.0.0.1:3017';// 服务器地址
 
 //CORS跨域
 router.all("*", function (req, res, next) {
@@ -47,13 +47,25 @@ var storage2 = multer.diskStorage({
 });
 var upload2 = multer({storage: storage2})//使用配置文件
 
+var storage3 = multer.diskStorage({
+    destination: function (req, file, cb) {
+        var dir = "public/photographer"; // 设置目录名称
+        multer({dest: dir});// 如果目录不存在就创建目录
+        cb(null, dir);// 把上传的文件存在这个目录
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + "." + file.originalname.split(".")[1]);//设置上传的文件名称
+    }
+});
+var upload3 = multer({storage: storage3})//使用配置文件
+
 // 数据库配置
 var mysql = require('mysql');
 var con = mysql.createConnection({
     host: 'localhost',//数据库ip地址账号
     user: 'root',//数据库 登录用户名
     // port: 3307,
-    password: '1234567890',//数据库 登录密码
+    password: '123456',//数据库 登录密码
     database: 'sys_nobound'//数据库名称
 });
 
@@ -301,4 +313,23 @@ router.post('/editorImages', upload2.single('file'), function (req, res) {
         res.send(req.file.filename);
     });
 });
+
+// 摄影作品测试接口
+router.get('/getImages', function (req, res) {
+    let sql = 'select * from nblog_editorimages';
+    con.query(sql, function (e, r) {
+        res.send(r);
+    });
+});
+
+// 摄影作品上传接口
+router.post('/creatPhotographer', upload3.single('file'), function (req, res) {
+    let sql = 'insert into nblog_photographer set imgUrl=?';
+    let data = [
+        req.file.filename,
+    ];
+    con.query(sql, data, function (e, r) {
+        res.send(r)
+    })
+})
 module.exports = router;
