@@ -314,21 +314,28 @@ router.post('/editorImages', upload2.single('file'), function (req, res) {
     });
 });
 
-// 摄影作品测试接口
+// 获取摄影作品测试接口
 router.get('/getImages', function (req, res) {
-    let sql = 'select * from nblog_editorimages';
+    let sql = 'select * from nblog_photographer';
     con.query(sql, function (e, r) {
         res.send(r);
     });
 });
 
 // 摄影作品上传接口
-router.post('/creatPhotographer', upload3.single('file'), function (req, res) {
-    let sql = 'insert into nblog_photographer set imgUrl=?';
-    let data = [
-        req.file.filename,
-    ];
-    con.query(sql, data, function (e, r) {
+let cpUpload = upload.fields([{name: 'files', maxCount: 10},])
+router.post('/creatPhotographer', cpUpload, function (req, res) {
+    // 数据库批量插入命令
+    let sql = "insert into nblog_photographer(imgUrl,pid) values?";
+    // data一定要写成数组嵌套数组的形式
+    let data = []
+    for (let item of req.files.files) {
+        let arr = [];
+        arr.push(item.filename,req.body.id);
+        data.push(arr);
+    }
+    console.log(data)
+    con.query(sql, [data], function (e, r) {
         res.send(r)
     })
 })
