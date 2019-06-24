@@ -331,12 +331,49 @@ router.post('/creatPhotographer', cpUpload, function (req, res) {
     let data = []
     for (let item of req.files.files) {
         let arr = [];
-        arr.push(item.filename,req.body.id);
+        arr.push(item.filename, req.body.id);
         data.push(arr);
     }
     console.log(data)
     con.query(sql, [data], function (e, r) {
         res.send(r)
+    })
+})
+
+// 获取分类下的图片
+router.get('/getSingle', function (req, res) {
+    let sql = 'select * from nblog_photographer where pid=?'
+    let data = [
+        req.query.pid
+    ]
+    con.query(sql, data, function (e, r) {
+        res.send(r)
+    })
+})
+
+// 获取单条图片信息
+router.get('/getPhotoInfo', function (req, res) {
+    let sql = 'select * from nblog_photographer where id=?'
+    let data = [
+        req.query.id
+    ]
+    con.query(sql, data, function (e, r) {
+        res.send(r)
+    })
+})
+
+router.post('/updatePhotoInfo', function (req, res) {
+    console.log(req.query)
+    let sql = 'update nblog_photographer set pid=?,title=?,description=? where id=? ';
+    let data = [
+        req.body.rePid,
+        req.body.title,
+        req.body.description,
+        req.body.id
+    ]
+    con.query(sql, data, function (e, r) {
+        console.log(r)
+        res.send('更新成功')
     })
 })
 module.exports = router;
