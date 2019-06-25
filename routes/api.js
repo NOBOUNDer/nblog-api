@@ -323,7 +323,7 @@ router.get('/getImages', function (req, res) {
 });
 
 // 摄影作品上传接口
-let cpUpload = upload.fields([{name: 'files', maxCount: 10},])
+let cpUpload = upload3.fields([{name: 'files', maxCount: 10},])
 router.post('/creatPhotographer', cpUpload, function (req, res) {
     // 数据库批量插入命令
     let sql = "insert into nblog_photographer(imgUrl,pid) values?";
@@ -340,7 +340,7 @@ router.post('/creatPhotographer', cpUpload, function (req, res) {
     })
 })
 
-// 获取分类下的图片
+// 获取分类下的摄影作品
 router.get('/getSingle', function (req, res) {
     let sql = 'select * from nblog_photographer where pid=?'
     let data = [
@@ -351,7 +351,7 @@ router.get('/getSingle', function (req, res) {
     })
 })
 
-// 获取单条图片信息
+// 获取单条摄影作品信息
 router.get('/getPhotoInfo', function (req, res) {
     let sql = 'select * from nblog_photographer where id=?'
     let data = [
@@ -362,8 +362,8 @@ router.get('/getPhotoInfo', function (req, res) {
     })
 })
 
+// 更新摄影作品信息
 router.post('/updatePhotoInfo', function (req, res) {
-    console.log(req.query)
     let sql = 'update nblog_photographer set pid=?,title=?,description=? where id=? ';
     let data = [
         req.body.rePid,
@@ -374,6 +374,17 @@ router.post('/updatePhotoInfo', function (req, res) {
     con.query(sql, data, function (e, r) {
         console.log(r)
         res.send('更新成功')
+    })
+})
+
+// 删除摄影作品
+router.get('/deletePhoto', function (req, res) {
+    let sql = 'delete from nblog_photographer where id=?'
+    let data = [
+        req.query.id
+    ]
+    con.query(sql,data,function (e, r) {
+        res.send('删除成功')
     })
 })
 module.exports = router;
